@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Calculator, FileText, Share2, Trophy, Target } from 'lucide-react';
+import { Calculator, FileText, Share2, Trophy, Target, TrendingUp, Award, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -32,6 +32,7 @@ const ACFTCalculator = () => {
   });
 
   const [scores, setScores] = useState<ACFTScore | null>(null);
+  const [isCalculating, setIsCalculating] = useState(false);
 
   // Simplified scoring logic (actual ACFT scoring is more complex)
   const calculateScore = (value: number, event: string, age: number, gender: string): number => {
@@ -66,7 +67,7 @@ const ACFTCalculator = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.age || !formData.gender) {
@@ -77,6 +78,11 @@ const ACFTCalculator = () => {
       });
       return;
     }
+
+    setIsCalculating(true);
+
+    // Simulate calculation delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     const age = parseInt(formData.age);
     
@@ -103,19 +109,50 @@ const ACFTCalculator = () => {
     ) - calculatedScores.total; // Subtract to avoid double counting
 
     setScores(calculatedScores);
+    setIsCalculating(false);
     
     toast({
-      title: "Score Calculated!",
+      title: "Score Calculated! 🎯",
       description: `Your total ACFT score is ${calculatedScores.total}/600`,
     });
   };
 
   const getScoreInterpretation = (score: number) => {
-    if (score >= 540) return { level: "Excellent", color: "text-emerald-600", bgColor: "bg-emerald-50" };
-    if (score >= 480) return { level: "Very Good", color: "text-blue-600", bgColor: "bg-blue-50" };
-    if (score >= 420) return { level: "Good", color: "text-green-600", bgColor: "bg-green-50" };
-    if (score >= 360) return { level: "Satisfactory", color: "text-yellow-600", bgColor: "bg-yellow-50" };
-    return { level: "Needs Improvement", color: "text-red-600", bgColor: "bg-red-50" };
+    if (score >= 540) return { 
+      level: "Excellent", 
+      color: "text-emerald-600", 
+      bgColor: "bg-emerald-50", 
+      icon: Trophy,
+      message: "Outstanding performance! You're in top condition." 
+    };
+    if (score >= 480) return { 
+      level: "Very Good", 
+      color: "text-blue-600", 
+      bgColor: "bg-blue-50", 
+      icon: Award,
+      message: "Great job! Your fitness level is well above average." 
+    };
+    if (score >= 420) return { 
+      level: "Good", 
+      color: "text-green-600", 
+      bgColor: "bg-green-50", 
+      icon: CheckCircle,
+      message: "Good performance! Keep up the training." 
+    };
+    if (score >= 360) return { 
+      level: "Satisfactory", 
+      color: "text-yellow-600", 
+      bgColor: "bg-yellow-50", 
+      icon: Target,
+      message: "You passed! Focus on improving weak areas." 
+    };
+    return { 
+      level: "Needs Improvement", 
+      color: "text-red-600", 
+      bgColor: "bg-red-50", 
+      icon: AlertCircle,
+      message: "Additional training required. Don't give up!" 
+    };
   };
 
   const shareScore = (platform: string) => {
@@ -172,218 +209,301 @@ const ACFTCalculator = () => {
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      age: '',
+      gender: '',
+      deadlift: '',
+      powerThrow: '',
+      pushups: '',
+      sprintDragCarry: '',
+      legTuckPlank: '',
+      legTuckPlankType: 'legTuck',
+      run: ''
+    });
+    setScores(null);
+  };
+
   return (
-    <section id="calculator" className="py-20 bg-white">
+    <section id="calculator" className="py-20 bg-gradient-to-br from-slate-50 to-slate-100">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-600 rounded-full mb-6">
+            <Calculator className="w-8 h-8 text-white" />
+          </div>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
             Calculate Your ACFT Score
           </h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Enter your performance data for each of the six ACFT events to get your official score.
+            Enter your performance data for each of the six ACFT events to get your official score with detailed analysis.
           </p>
         </div>
 
         <div className="max-w-4xl mx-auto">
-          <Card className="shadow-xl border-0">
-            <CardHeader className="bg-slate-50 border-b">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <Calculator className="h-6 w-6 text-emerald-600" />
+          <Card className="shadow-2xl border-0 overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <div className="p-2 bg-white/20 rounded-lg">
+                  <Target className="h-6 w-6" />
+                </div>
                 ACFT Performance Data
+                <div className="ml-auto flex items-center gap-2 text-sm">
+                  <TrendingUp className="h-4 w-4" />
+                  Real-time Scoring
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8">
               <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Personal Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <Label htmlFor="age" className="text-sm font-medium text-slate-700">
-                      Age
-                    </Label>
-                    <Input
-                      id="age"
-                      type="number"
-                      placeholder="Enter your age"
-                      value={formData.age}
-                      onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
-                      className="mt-1"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="gender" className="text-sm font-medium text-slate-700">
-                      Gender
-                    </Label>
-                    <Select onValueChange={(value) => setFormData(prev => ({ ...prev, gender: value }))}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                      </SelectContent>
-                    </Select>
+                <div className="bg-slate-50 rounded-lg p-6 border-l-4 border-emerald-500">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                    Personal Information
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="age" className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        Age Range
+                        <span className="text-emerald-600">*</span>
+                      </Label>
+                      <Select onValueChange={(value) => setFormData(prev => ({ ...prev, age: value }))}>
+                        <SelectTrigger className="border-2 hover:border-emerald-300 focus:border-emerald-500 transition-colors">
+                          <SelectValue placeholder="Select your age range" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="18-21">18-21 years</SelectItem>
+                          <SelectItem value="22-26">22-26 years</SelectItem>
+                          <SelectItem value="27-31">27-31 years</SelectItem>
+                          <SelectItem value="32-36">32-36 years</SelectItem>
+                          <SelectItem value="37-41">37-41 years</SelectItem>
+                          <SelectItem value="42-46">42-46 years</SelectItem>
+                          <SelectItem value="47-51">47-51 years</SelectItem>
+                          <SelectItem value="52-56">52-56 years</SelectItem>
+                          <SelectItem value="57-61">57-61 years</SelectItem>
+                          <SelectItem value="62+">62+ years</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="gender" className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        Gender
+                        <span className="text-emerald-600">*</span>
+                      </Label>
+                      <Select onValueChange={(value) => setFormData(prev => ({ ...prev, gender: value }))}>
+                        <SelectTrigger className="border-2 hover:border-emerald-300 focus:border-emerald-500 transition-colors">
+                          <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="female">Female</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
 
                 {/* ACFT Events */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <Label htmlFor="deadlift" className="text-sm font-medium text-slate-700">
-                      3-Rep Max Deadlift (lbs)
-                    </Label>
-                    <Input
-                      id="deadlift"
-                      type="number"
-                      placeholder="e.g., 340"
-                      value={formData.deadlift}
-                      onChange={(e) => setFormData(prev => ({ ...prev, deadlift: e.target.value }))}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="powerThrow" className="text-sm font-medium text-slate-700">
-                      Standing Power Throw (meters)
-                    </Label>
-                    <Input
-                      id="powerThrow"
-                      type="number"
-                      step="0.1"
-                      placeholder="e.g., 12.5"
-                      value={formData.powerThrow}
-                      onChange={(e) => setFormData(prev => ({ ...prev, powerThrow: e.target.value }))}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="pushups" className="text-sm font-medium text-slate-700">
-                      Hand-Release Push-ups (repetitions)
-                    </Label>
-                    <Input
-                      id="pushups"
-                      type="number"
-                      placeholder="e.g., 60"
-                      value={formData.pushups}
-                      onChange={(e) => setFormData(prev => ({ ...prev, pushups: e.target.value }))}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="sprintDragCarry" className="text-sm font-medium text-slate-700">
-                      Sprint-Drag-Carry (MM:SS)
-                    </Label>
-                    <Input
-                      id="sprintDragCarry"
-                      type="text"
-                      placeholder="e.g., 1:33"
-                      value={formData.sprintDragCarry}
-                      onChange={(e) => setFormData(prev => ({ ...prev, sprintDragCarry: e.target.value }))}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="legTuckPlankType" className="text-sm font-medium text-slate-700">
-                      Leg Tuck or Plank
-                    </Label>
-                    <Select onValueChange={(value) => setFormData(prev => ({ ...prev, legTuckPlankType: value }))}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select event type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="legTuck">Leg Tuck (repetitions)</SelectItem>
-                        <SelectItem value="plank">Plank (MM:SS)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="legTuckPlank" className="text-sm font-medium text-slate-700">
-                      {formData.legTuckPlankType === 'legTuck' ? 'Leg Tuck Repetitions' : 'Plank Duration (MM:SS)'}
-                    </Label>
-                    <Input
-                      id="legTuckPlank"
-                      type={formData.legTuckPlankType === 'legTuck' ? 'number' : 'text'}
-                      placeholder={formData.legTuckPlankType === 'legTuck' ? 'e.g., 20' : 'e.g., 2:30'}
-                      value={formData.legTuckPlank}
-                      onChange={(e) => setFormData(prev => ({ ...prev, legTuckPlank: e.target.value }))}
-                      className="mt-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <Label htmlFor="run" className="text-sm font-medium text-slate-700">
-                      2-Mile Run (MM:SS)
-                    </Label>
-                    <Input
-                      id="run"
-                      type="text"
-                      placeholder="e.g., 13:30"
-                      value={formData.run}
-                      onChange={(e) => setFormData(prev => ({ ...prev, run: e.target.value }))}
-                      className="mt-1"
-                    />
+                <div className="bg-slate-50 rounded-lg p-6 border-l-4 border-blue-500">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    ACFT Test Events
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="deadlift" className="text-sm font-medium text-slate-700">
+                        3-Rep Max Deadlift (lbs)
+                      </Label>
+                      <Input
+                        id="deadlift"
+                        type="number"
+                        placeholder="e.g., 340"
+                        value={formData.deadlift}
+                        onChange={(e) => setFormData(prev => ({ ...prev, deadlift: e.target.value }))}
+                        className="border-2 hover:border-blue-300 focus:border-blue-500 transition-colors"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="powerThrow" className="text-sm font-medium text-slate-700">
+                        Standing Power Throw (meters)
+                      </Label>
+                      <Input
+                        id="powerThrow"
+                        type="number"
+                        step="0.1"
+                        placeholder="e.g., 12.5"
+                        value={formData.powerThrow}
+                        onChange={(e) => setFormData(prev => ({ ...prev, powerThrow: e.target.value }))}
+                        className="border-2 hover:border-blue-300 focus:border-blue-500 transition-colors"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="pushups" className="text-sm font-medium text-slate-700">
+                        Hand-Release Push-ups (repetitions)
+                      </Label>
+                      <Input
+                        id="pushups"
+                        type="number"
+                        placeholder="e.g., 60"
+                        value={formData.pushups}
+                        onChange={(e) => setFormData(prev => ({ ...prev, pushups: e.target.value }))}
+                        className="border-2 hover:border-blue-300 focus:border-blue-500 transition-colors"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="sprintDragCarry" className="text-sm font-medium text-slate-700">
+                        Sprint-Drag-Carry (MM:SS)
+                      </Label>
+                      <Input
+                        id="sprintDragCarry"
+                        type="text"
+                        placeholder="e.g., 1:33"
+                        value={formData.sprintDragCarry}
+                        onChange={(e) => setFormData(prev => ({ ...prev, sprintDragCarry: e.target.value }))}
+                        className="border-2 hover:border-blue-300 focus:border-blue-500 transition-colors"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="legTuckPlankType" className="text-sm font-medium text-slate-700">
+                        Core Event Type
+                      </Label>
+                      <Select onValueChange={(value) => setFormData(prev => ({ ...prev, legTuckPlankType: value }))}>
+                        <SelectTrigger className="border-2 hover:border-blue-300 focus:border-blue-500 transition-colors">
+                          <SelectValue placeholder="Select event type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="legTuck">Leg Tuck (repetitions)</SelectItem>
+                          <SelectItem value="plank">Plank (MM:SS)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="legTuckPlank" className="text-sm font-medium text-slate-700">
+                        {formData.legTuckPlankType === 'legTuck' ? 'Leg Tuck Repetitions' : 'Plank Duration (MM:SS)'}
+                      </Label>
+                      <Input
+                        id="legTuckPlank"
+                        type={formData.legTuckPlankType === 'legTuck' ? 'number' : 'text'}
+                        placeholder={formData.legTuckPlankType === 'legTuck' ? 'e.g., 20' : 'e.g., 2:30'}
+                        value={formData.legTuckPlank}
+                        onChange={(e) => setFormData(prev => ({ ...prev, legTuckPlank: e.target.value }))}
+                        className="border-2 hover:border-blue-300 focus:border-blue-500 transition-colors"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 text-lg">
-                  <Calculator className="mr-2 h-5 w-5" />
-                  Calculate ACFT Score
-                </Button>
+                <div className="bg-slate-50 rounded-lg p-6 border-l-4 border-purple-500">
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                    Cardio Event
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="run" className="text-sm font-medium text-slate-700">
+                        2-Mile Run Time (MM:SS)
+                      </Label>
+                      <Input
+                        id="run"
+                        type="text"
+                        placeholder="e.g., 13:30"
+                        value={formData.run}
+                        onChange={(e) => setFormData(prev => ({ ...prev, run: e.target.value }))}
+                        className="border-2 hover:border-purple-300 focus:border-purple-500 transition-colors"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <Button 
+                    type="submit" 
+                    disabled={isCalculating}
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-4 text-lg font-semibold transition-all duration-300 transform hover:scale-105"
+                  >
+                    {isCalculating ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                        Calculating...
+                      </>
+                    ) : (
+                      <>
+                        <Calculator className="mr-2 h-5 w-5" />
+                        Calculate ACFT Score
+                      </>
+                    )}
+                  </Button>
+                  
+                  {scores && (
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      onClick={resetForm}
+                      className="px-6 py-4 border-2 hover:bg-slate-50"
+                    >
+                      Reset
+                    </Button>
+                  )}
+                </div>
               </form>
 
               {/* Results Section */}
               {scores && (
-                <div className="mt-12 space-y-6">
+                <div className="mt-12 space-y-8 animate-in fade-in duration-500">
+                  {/* Main Score Display */}
                   <div className="text-center">
-                    <h3 className="text-2xl font-bold text-slate-900 mb-2">Your ACFT Results</h3>
-                    <div className={`inline-block px-6 py-3 rounded-lg ${getScoreInterpretation(scores.total).bgColor}`}>
-                      <div className="text-3xl font-bold text-slate-900">{scores.total}/600</div>
-                      <div className={`text-sm ${getScoreInterpretation(scores.total).color}`}>
+                    <h3 className="text-3xl font-bold text-slate-900 mb-6">Your ACFT Results</h3>
+                    <div className={`inline-block px-8 py-6 rounded-2xl ${getScoreInterpretation(scores.total).bgColor} border-2 border-white shadow-lg`}>
+                      <div className="flex items-center justify-center gap-3 mb-3">
+                        {React.createElement(getScoreInterpretation(scores.total).icon, {
+                          className: `w-8 h-8 ${getScoreInterpretation(scores.total).color}`
+                        })}
+                        <div className="text-4xl font-bold text-slate-900">{scores.total}/600</div>
+                      </div>
+                      <div className={`text-lg font-semibold ${getScoreInterpretation(scores.total).color} mb-2`}>
                         {getScoreInterpretation(scores.total).level}
+                      </div>
+                      <div className="text-sm text-slate-600">
+                        {getScoreInterpretation(scores.total).message}
                       </div>
                     </div>
                   </div>
 
                   {/* Individual Event Scores */}
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="text-center p-4 bg-slate-50 rounded-lg">
-                      <div className="font-semibold text-slate-900">{scores.deadlift}</div>
-                      <div className="text-sm text-slate-600">Deadlift</div>
-                    </div>
-                    <div className="text-center p-4 bg-slate-50 rounded-lg">
-                      <div className="font-semibold text-slate-900">{scores.powerThrow}</div>
-                      <div className="text-sm text-slate-600">Power Throw</div>
-                    </div>
-                    <div className="text-center p-4 bg-slate-50 rounded-lg">
-                      <div className="font-semibold text-slate-900">{scores.pushups}</div>
-                      <div className="text-sm text-slate-600">Push-ups</div>
-                    </div>
-                    <div className="text-center p-4 bg-slate-50 rounded-lg">
-                      <div className="font-semibold text-slate-900">{scores.sprintDragCarry}</div>
-                      <div className="text-sm text-slate-600">Sprint-Drag-Carry</div>
-                    </div>
-                    <div className="text-center p-4 bg-slate-50 rounded-lg">
-                      <div className="font-semibold text-slate-900">{scores.legTuckPlank}</div>
-                      <div className="text-sm text-slate-600">Leg Tuck/Plank</div>
-                    </div>
-                    <div className="text-center p-4 bg-slate-50 rounded-lg">
-                      <div className="font-semibold text-slate-900">{scores.run}</div>
-                      <div className="text-sm text-slate-600">2-Mile Run</div>
-                    </div>
+                    {[
+                      { score: scores.deadlift, label: "Deadlift", icon: "💪" },
+                      { score: scores.powerThrow, label: "Power Throw", icon: "🏋️" },
+                      { score: scores.pushups, label: "Push-ups", icon: "💥" },
+                      { score: scores.sprintDragCarry, label: "Sprint-Drag-Carry", icon: "🏃" },
+                      { score: scores.legTuckPlank, label: "Leg Tuck/Plank", icon: "🎯" },
+                      { score: scores.run, label: "2-Mile Run", icon: "🏃‍♂️" }
+                    ].map((event, index) => (
+                      <div key={index} className="text-center p-4 bg-white rounded-xl shadow-md border-2 border-slate-100 hover:border-emerald-200 transition-colors">
+                        <div className="text-2xl mb-2">{event.icon}</div>
+                        <div className="font-bold text-2xl text-slate-900">{event.score}</div>
+                        <div className="text-sm text-slate-600 font-medium">{event.label}</div>
+                        <div className="w-full bg-slate-200 rounded-full h-2 mt-2">
+                          <div 
+                            className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
+                            style={{ width: `${event.score}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                   {/* Action Buttons */}
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button onClick={printResults} variant="outline" className="flex items-center">
+                    <Button onClick={printResults} variant="outline" className="flex items-center border-2 hover:bg-slate-50">
                       <FileText className="mr-2 h-4 w-4" />
                       Print Results
                     </Button>
-                    <Button onClick={() => shareScore('twitter')} variant="outline" className="flex items-center">
+                    <Button onClick={() => shareScore('twitter')} variant="outline" className="flex items-center border-2 hover:bg-blue-50">
                       <Share2 className="mr-2 h-4 w-4" />
                       Share on Twitter
                     </Button>
-                    <Button onClick={() => shareScore('linkedin')} variant="outline" className="flex items-center">
+                    <Button onClick={() => shareScore('linkedin')} variant="outline" className="flex items-center border-2 hover:bg-blue-50">
                       <Share2 className="mr-2 h-4 w-4" />
                       Share on LinkedIn
                     </Button>
