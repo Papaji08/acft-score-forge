@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import ACFTCalculator from '@/components/ACFTCalculator';
+import ACFTScoringSection from '@/components/ACFTScoringSection';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import HeroSection from '@/components/HeroSection';
@@ -21,6 +22,7 @@ const Index = () => {
       <main>
         <HeroSection />
         <ACFTCalculator />
+        <ACFTScoringSection />
         <InfoSection />
         <FAQSection />
       </main>
