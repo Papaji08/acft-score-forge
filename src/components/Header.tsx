@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Header = () => {
@@ -15,7 +15,7 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-emerald-600 rounded-md flex items-center justify-center">
-              <span className="text-white font-bold text-sm">AC</span>
+              <Calculator className="w-5 h-5 text-white" />
             </div>
             <span className="text-white font-bold text-xl">ACFT Calculator</span>
           </div>

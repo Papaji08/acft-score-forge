@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { Trophy, Target, Zap, FileText, TrendingUp, Users } from 'lucide-react';
+import { Trophy, Target, Zap, TrendingUp, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 
 const InfoSection = () => {
   return (
@@ -138,26 +137,6 @@ const InfoSection = () => {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Download Standards */}
-        <div className="text-center">
-          <Card className="max-w-md mx-auto border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-center gap-2">
-                <FileText className="h-6 w-6 text-emerald-600" />
-                ACFT Standards Guide
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-slate-600 mb-4">
-                Download the official ACFT scoring standards and training guide.
-              </p>
-              <Button className="w-full bg-emerald-600 hover:bg-emerald-700">
-                Download PDF Guide
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </section>

@@ -78,21 +78,10 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="border-t border-slate-800 mt-8 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
+          <div className="text-center">
             <p className="text-slate-400 text-sm">
               © 2025 ACFT Calculator. All rights reserved.
             </p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-slate-400 hover:text-white transition-colors text-sm">
-                Privacy Policy
-              </a>
-              <a href="#" className="text-slate-400 hover:text-white transition-colors text-sm">
-                Terms of Service
-              </a>
-              <a href="#" className="text-slate-400 hover:text-white transition-colors text-sm">
-                Disclaimer
-              </a>
-            </div>
           </div>
         </div>
       </div>
