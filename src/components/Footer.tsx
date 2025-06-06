@@ -80,7 +80,7 @@ const Footer = () => {
         <div className="border-t border-slate-800 mt-8 pt-8">
           <div className="text-center">
             <p className="text-slate-400 text-sm">
-              © 2025 ACFT Calculator. All rights reserved.
+              © 2025 ACFT Calculator by <a href="https://clangity.com" className="text-emerald-400 hover:text-emerald-300 transition-colors">Clangity.com</a>. All rights reserved.
             </p>
           </div>
         </div>
